@@ -12,6 +12,13 @@ body{
     background-color: #E3D8D6;
     overflow-x: hidden;
 }
+#titulo, #slogan{
+    margin: 15px;
+    text-align: center;
+}
+.formBuscar{
+    margin-top: 80px;
+}
 .modal-contenedor{
     display:flex;
     align-items: center;
@@ -37,4 +44,22 @@ a{
 }
 .boton{
     opacity:0;
+}
+.row{
+    align-content: center;
+    justify-content: space-evenly;
+}
+.card-inexistente{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+footer {
+    background-color: rgb(47, 46, 49);
+    font-weight: 700;
+    padding: 10px;
+    color: beige;
+    text-align: center;
 }
