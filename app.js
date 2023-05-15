@@ -1,56 +1,16 @@
-  const contenedor = document.querySelector("#contenedor")
-  const carritoContenedor = document.querySelector("#carritoContenedor")
-  const vaciarCarrito = document.querySelector("#vaciarCarrito")
-  const precioTotal = document.querySelector("#precioTotal")
-  const activarFuncion = document.querySelector("#activarFuncion")
-  const procesarCompra = document.querySelector("#procesarCompra")
-  const totalProceso = document.querySelector("#totalProceso")
-  const formulario = document.querySelector('#procesar-pago')
-  const inputBuscar = document.querySelector ("#inputsearch")
-  let carrito =[]
-  const productos = []
-  const URL = 'productos.json'
+const stockProductos = [];
+let carrito = [];
+const inputBuscar = document.querySelector("input#inputSearch");
+const contenedor = document.querySelector("#contenedor");
+const carritoContenedor = document.querySelector("#carritoContenedor");
+const vaciarCarrito = document.querySelector("#vaciarCarrito");
+const precioTotal = document.querySelector("#precioTotal");
+const activarFuncion = document.querySelector("#activarFuncion");
+const procesarCompra = document.querySelector("#procesarCompra");
+const totalProceso = document.querySelector("#totalProceso");
+const formulario = document.querySelector('#procesar-pago')
 
-
-if (activarFuncion) {
-  activarFuncion.addEventListener("click", procesarPedido)
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  carrito = JSON.parse(localStorage.getItem("carrito")) || []
-  mostrarCarrito()
-
-  document.querySelector("#activarFuncion").click(procesarPedido)
-})
-
-
-if(formulario){
-  formulario.addEventListener('submit', enviarCompra)
-}
-
-
-if (vaciarCarrito) {
-  vaciarCarrito.addEventListener("click", () => {
-    carrito.length = []
-    mostrarCarrito()
-  })
-}
-
-
-if (procesarCompra) {
-  procesarCompra.addEventListener("click", () => {
-    if (carrito.length === 0) {
-      Swal.fire({
-        title: "¡Tu carrito está vacio!",
-        text: "Compra algo para continuar con la compra",
-        icon: "error",
-        confirmButtonText: "Aceptar",
-      })
-    } else {
-      location.href = "compra.html"
-    }
-  })
-}
+const URL = 'productos.json'
 
 const mostrarCardError = ()=>  {
   return `<div class="card-error">
@@ -60,29 +20,6 @@ const mostrarCardError = ()=>  {
               <h4>Intenta de nuevo en unos minutos...</h4>
           </div>`
 }
-
-async function obtenerProductos() {
-  try {
-      const response = await fetch(URL)
-      const data = await response.json()
-          productos.push(...data)
-          cargarProductos(productos)
-  } catch (error) {
-      contenedor.innerHTML = mostrarCardError()
-  }
-}
-obtenerProductos()
-
-/*  const obtenerProductos = ()=> { //FETCH manejado con promesas
-     fetch(URL)
-         .then((response)=> response.json() )
-         .then((data)=> productos.push(...data))
-         .then(()=> cargarProductos(productos))
-          .catch(error => { contenedor.innerHTML = mostrarCardError()
-         })
- }
- obtenerProductos() */
-
 
 function retornoCardHTML(prod) {
   const { id, nombre, precio, desc, img, cantidad } = prod
@@ -105,22 +42,57 @@ function cargarProductos(array) {
   })
 }
 
-
-
-function notificacionAgregado() {
-  Toastify({
-      text: "Servicio agregado.",
-      className: "info",
-      duration: 3000,
-      close: true,
-      gravity: "top",
-      position: "right",
-      style: {
-        background: "darkorange"
-      }
-    }).showToast();
-
+async function obtenerProductos() {
+  try {
+      const response = await fetch(URL)
+      const data = await response.json()
+          stockProductos.push(...data)
+          cargarProductos(stockProductos)
+  } catch (error) {
+      contenedor.innerHTML = mostrarCardError()
+  }
 }
+obtenerProductos()
+
+
+if (activarFuncion) {
+  activarFuncion.addEventListener("click", procesarPedido);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+  mostrarCarrito();
+  document.querySelector("#activarFuncion").click(procesarPedido);
+});
+if(formulario){
+  formulario.addEventListener('submit', enviarCompra)
+}
+
+
+if (vaciarCarrito) {
+  vaciarCarrito.addEventListener("click", () => {
+    carrito.length = [];
+    mostrarCarrito();
+  });
+}
+
+if (procesarCompra) {
+  procesarCompra.addEventListener("click", () => {
+    if (carrito.length === 0) {
+      Swal.fire({
+        title: "¡Tu carrito está vacio!",
+        text: "Compra algo para continuar con la compra",
+        icon: "error",
+        confirmButtonText: "Aceptar",
+      });
+    } else {
+      location.href = "compra.html";
+    }
+  });
+}
+
+
 const agregarProducto = (id) => {
   const existe = carrito.some(prod => prod.id === id)
 
@@ -131,74 +103,73 @@ const agregarProducto = (id) => {
       }
     })
   } else {
-    const item = productos.find((prod) => prod.id === id)
+    const item = stockProductos.find((prod) => prod.id === id)
     carrito.push(item)
   }
   mostrarCarrito()
-  notificacionAgregado()
-  guardarStorage()
 
-}
-
+};
 
 const mostrarCarrito = () => {
-  const modalBody = document.querySelector(".modal-body")
+  const modalBody = document.querySelector(".modal .modal-body");
   if (modalBody) {
-    modalBody.innerHTML = ""
+    modalBody.innerHTML = "";
     carrito.forEach((prod) => {
       const { id, nombre, precio, img, cantidad } = prod
-      console.log(modalBody)
-      modalBody.innerHTML += `<div class="modal-contenedor">
-                                  <div>
-                                  <img class="img-fluid img-carrito" src="${img}"/>
-                                  </div>
-                                  <div>
-                                    <p>Producto: ${nombre}</p>
-                                    <p>Precio: ${precio}</p>
-                                    <p>Cantidad :${cantidad}</p>
-                                    <button class="btn btn-danger" onclick="eliminarProducto(${id})">Eliminar producto</button>
-                                  </div>
-                              </div>`
-    })
+      console.log(modalBody);
+      modalBody.innerHTML += `
+      <div class="modal-contenedor">
+        <div>
+        <img class="img-fluid img-carrito" src="${img}"/>
+        </div>
+        <div>
+        <p>Producto: ${nombre}</p>
+      <p>Precio: ${precio}</p>
+      <p>Cantidad :${cantidad}</p>
+      <button class="btn btn-danger"  onclick="eliminarProducto(${id})">Eliminar producto</button>
+        </div>
+      </div>
+      
+  
+      `;
+    });
   }
 
   if (carrito.length === 0) {
-    console.log("Nada en el carrito")
+    console.log("Nada");
     modalBody.innerHTML = `
     <p class="text-center text-primary parrafo">¡Aun no agregaste nada!</p>
-    `
+    `;
   } else {
-    console.log("Algo")
+    console.log("Algo");
   }
-  carritoContenedor.textContent = carrito.length
+  carritoContenedor.textContent = carrito.length;
 
   if (precioTotal) {
     precioTotal.innerText = carrito.reduce(
-      (acc, prod) => acc + prod.cantidad * prod.precio, 0 )
+      (acc, prod) => acc + prod.cantidad * prod.precio,
+      0
+    );
   }
 
-  guardarStorage()
-}
-
-
+  guardarStorage();
+};
 
 function guardarStorage() {
-  localStorage.setItem("carrito", JSON.stringify(carrito))
+  localStorage.setItem("carrito", JSON.stringify(carrito));
 }
 
 function eliminarProducto(id) {
-  const servicioId = id
-  carrito = carrito.filter((servicio) => servicio.id !== servicioId)
-  mostrarCarrito()
+  const productoID = id;
+  carrito = carrito.filter((producto) => producto.id !== productoID);
+  mostrarCarrito();
 }
-
-
 function procesarPedido() {
   carrito.forEach((prod) => {
-    const listaCompra = document.querySelector("#lista-compra tbody")
-    const {nombre, precio, img, cantidad } = prod
+    const listaCompra = document.querySelector("#lista-compra tbody");
+    const { nombre, precio, img, cantidad } = prod;
     if (listaCompra) {
-      const row = document.createElement("tr")
+      const row = document.createElement("tr");
       row.innerHTML += `
               <td>
               <img class="img-fluid img-carrito" src="${img}"/>
@@ -207,16 +178,15 @@ function procesarPedido() {
             <td>${precio}</td>
             <td>${cantidad}</td>
             <td>${precio * cantidad}</td>
-            `
+            `;
       listaCompra.appendChild(row);
     }
-  })
+  });
   totalProceso.innerText = carrito.reduce(
     (acc, prod) => acc + prod.cantidad * prod.precio,
     0
-  )
+  );
 }
-
 
  function enviarCompra(e){
    e.preventDefault()
@@ -231,29 +201,26 @@ function procesarPedido() {
        confirmButtonText: "Aceptar",
    })
  } else {
+
   const btn = document.getElementById('button');
 
-/*   document.getElementById('form')
-   .addEventListener('submit', function(event) {
-     event.preventDefault(); */
-  
-     btn.value = 'Enviando...';
-  
-     const serviceID = 'default_service';
-     const templateID = 'template_t8vh5qj';
-  
-     emailjs.sendForm(serviceID, templateID, this)
-      .then(() => {
-        btn.value = 'Send Email';
-        alert('Sent!');
-      }, (err) => {
-        btn.value = 'Send Email';
-        alert(JSON.stringify(err));
-      });
-  }
-    
+// document.getElementById('procesar-pago')
+//  .addEventListener('submit', function(event) {
+//    event.preventDefault();
 
-    // spinner //
+   btn.value = 'Enviando...';
+
+   const serviceID = 'default_service';
+   const templateID = 'template_t8vh5qj';
+
+   emailjs.sendForm(serviceID, templateID, this)
+    .then(() => {
+      btn.value = 'Finalizar compra';
+      alert('Correo enviado!');
+    }, (err) => {
+      btn.value = 'Finalizar compra';
+      alert(JSON.stringify(err));
+    });
     
    const spinner = document.querySelector('#spinner')
    spinner.classList.add('d-flex')
@@ -277,23 +244,16 @@ function procesarPedido() {
    }, 3000)
  }
  localStorage.clear()
- 
 
- // BUSCADOR //
+ }
 
- const CardInexistente = ()=> {
-  return `<div class="card-inexistente">
-              <h2>No se encontró el servicio ingresado</h2>
-              <h3>Por favor, intenta con una nueva búsqueda</h3>
-          </div>`
+//BUSCADOR// 
+
+function filtrarProductos() {
+  debugger;
+  let productoBuscado = stockProductos.filter((prod) =>prod.nombre.toLowerCase().includes(inputBuscar.value.toLowerCase().trim())
+  );
+  productoBuscado !== [] && cargarProductos(productoBuscado);
 }
-
-
-
-function filtrarProductos(valor) {
-  let resultado = productos.filter(prod => prod.nombre.toLowerCase().includes(valor.toLowerCase()))
-       resultado.length > 0 ? cargarProductos(resultado) : contenedor.innerHTML = CardInexistente()
-}
-inputBuscar.addEventListener("keyup", filtrarServicios)
-
-obtenerProductos()
+// Buscador letra por letra
+inputBuscar.addEventListener("keyup", filtrarProductos);
